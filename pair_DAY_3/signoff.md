@@ -76,3 +76,19 @@ Both partners confirm that questions were sharpened before the morning deadline,
 were exchanged, experiments were run (logit_bias override test and 100-task power eval), and
 results were discussed in the evening session. The grounding commit for Day 3 updates the
 Week 11 eval memo to reflect 100 tasks and the confirmed power analysis result.
+
+**Post-session validation:** Gashaw applied both explainers back to his Week 11 project
+and made three concrete changes:
+
+1. **Scoring bug fixed** — the scorer was reading banned words from input context, not the
+   model's response. Delta A corrected from 0.000 (measurement artifact) to +0.070. The
+   training signal was real; the metric was wrong.
+2. **bad_words_ids added** — decode-time enforcement added to the generation pipeline
+   (`build_bad_words_ids()` in `scoring_evaluator.py`). Direct application of the
+   training/inference enforcement gap finding: SFT shifts probability, decode-layer blocks
+   the token. Expected banned_phrase_check score: 0.33 → 1.00.
+3. **Held-out set expanded (n=3 → n=17)** — Gashaw applied Nebiyou's power analysis to
+   his own project. n=3 gives ~10% power. Moving to n=17 enables a real measurement.
+
+These three changes confirm that both explainers were understood and applicable beyond the
+pairing session itself.
