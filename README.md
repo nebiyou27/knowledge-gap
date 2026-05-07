@@ -24,6 +24,7 @@ commit record.
 |-----|---------|-------|
 | Day 1 | Natnael Alemseged | Inference-time mechanics — prompt caching and LoRA latency |
 | Day 2 | Addisu Taye | Agent and tool-use internals — function-calling at the token level |
+| Day 3 | Gashaw Bekele | Training mechanics — LoRA behavioral asymmetry and statistical power |
 
 ---
 
@@ -32,6 +33,7 @@ commit record.
 ```
 pair_DAY_1/          # Day 1 — Natnael Alemseged
 pair_DAY_2/          # Day 2 — Addisu Taye
+pair_DAY_3/          # Day 3 — Gashaw Bekele
 ```
 
 Each folder contains:
@@ -96,9 +98,47 @@ JSON rate).
 
 ---
 
+## Day 3 — Training Mechanics
+
+**Nebiyou's question:** In the Week 11 ORPO LoRA run, the adapter lifted pass rate from 12%
+to 26% (+14 pp, n=50), but p=0.23. What is the minimum diagnostic experiment to determine
+whether this is a sample-size problem before blaming the training setup? What eval size gives
+80% power to detect a +14 pp lift?
+
+**Gashaw's question:** The trained LoRA adapter reduced output length by 18% but showed
+Delta A = 0.00 on banned-phrase suppression. Both behaviors were in the training data. Why
+did one transfer and the other not?
+
+**Key findings:**
+
+- **Power analysis:** Cohen's h=0.3627 for 12%→26% lift. 80% power requires ~60 tasks
+  two-tailed; n=50 was underpowered. 100-task run resolved it: Delta B +18 pp,
+  CI [+2%, +36%] — CI excludes zero. Sample size was the blocker, not the training setup.
+- **LoRA asymmetry:** Objective mismatch, not rank limit. SFT's cross-entropy raises
+  log-probability of both chosen AND rejected responses (ORPO pilot study). Length reduction
+  is a dense, consistent signal — positive-only imitation handles it. Banned-token suppression
+  is sparse and local — SFT has no direct mechanism to penalize it.
+- **Enforcement layer:** Logit_bias=−100 blocked a token at the decode step even when the
+  model was explicitly instructed to use it (0/5 produced it vs 5/5 without constraint).
+  Preference signal and hard constraint operate at different layers.
+
+**Experiment:** 5-trial override test — both conditions told "you MUST use the word
+'absolutely'". Approach A (no constraint): 5/5 obeyed. Approach B (logit_bias=−100): 0/5
+produced it. Proves the mechanical difference between probability shift and decode-layer block.
+
+**Grounding commit:** `D:\TRP-1\week-11\Sales Eval Bench\reports\tenacious_bench_eval_memo.md`
+— updated statistical significance gate from "requires 150–200 tasks" to confirmed 100-task
+result: Delta B +18 pp, CI [+2%, +36%], significant.
+
+**Published:** [Medium blog](https://medium.com/p/821b9c233dd8)
+
+---
+
 ## Papers
 
 - Vaswani et al. (2017) *Attention Is All You Need* — [arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
 - Willard & Louf (2023) *Efficient Guided Generation for Large Language Models* — [arxiv.org/abs/2307.09702](https://arxiv.org/abs/2307.09702)
 - Geng et al. (2023) *Grammar-Constrained Decoding for Structured NLP Tasks without Finetuning* — [EMNLP 2023](https://github.com/epfl-dlab/GCD)
 - Hu et al. (2022) *LoRA: Low-Rank Adaptation of Large Language Models* — [arxiv.org/abs/2106.09685](https://arxiv.org/abs/2106.09685)
+- Hong et al. (2024) *ORPO: Monolithic Preference Optimization without Reference Model* — [arxiv.org/abs/2403.07691](https://arxiv.org/abs/2403.07691)
+- Welleck et al. (2019) *Neural Text Generation with Unlikelihood Training* — [arxiv.org/abs/1908.04319](https://arxiv.org/abs/1908.04319)
