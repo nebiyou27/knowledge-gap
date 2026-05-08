@@ -274,7 +274,9 @@ is in slot A, the judge is preferring position over content. Wang et al. (2023) 
 this pattern in GPT-4 — it preferred the first response in 60%+ of cases in some
 settings even when the content was equivalent.
 
-**Green flag:** flip_rate < 0.2 and slot_A_win_rates roughly equal across both orderings.
+**Initial green flag (not a clearance):** flip_rate < 0.2 and slot_A_win_rates roughly
+equal across both orderings. Note: 5 pairs is too small to fully rule out position bias —
+it is a low-cost first screen, not a definitive audit.
 
 ---
 
@@ -315,8 +317,9 @@ audit is still needed for the actual judge.
 
 Result from this screen: **no obvious positive length-bias pattern appears in the saved deterministic
 artifacts.** The trained outputs are much shorter than prompt-only outputs, and longer outputs do
-not receive higher local deterministic scores. This does not clear the live LLM judge, but it makes
-length bias a less likely explanation from the saved artifacts alone.
+not receive higher local deterministic scores. This does not clear the live LLM judge — the live
+judge may still behave differently — but it makes length bias less visible in the saved deterministic
+artifacts.
 
 ---
 
