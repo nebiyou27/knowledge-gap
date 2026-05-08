@@ -240,35 +240,41 @@ materially change LLM-judge outcomes, and the test is cheap.
 
 ---
 
-## Concrete demonstration: position-swap screen
+## Position-swap audit Yakob should run next
 
-I ran the position-swap diagnostic on 5 paired tasks from the Week 11 artifacts
-(trained vs prompt-only, same backbone).
+I did not run a live position-swap here because the diagnostic requires extra judge API
+calls against Yakob's actual LLM comparative judge — not a deterministic scorer. A
+deterministic scorer evaluates each candidate independently against a rubric, so slot
+order is irrelevant by design. Yakob's judge sees both candidates in one prompt and picks
+a winner — that is exactly where position bias lives.
 
-| Task | Score trained | Score prompt-only | Winner order1 (trained=A) | Winner order2 (prompt-only=A) | Flipped? |
-|---|---:|---:|---|---|---|
-| held_out-001 | higher | lower | slot_B | slot_A | No |
-| held_out-002 | higher | lower | slot_A | slot_B | No |
-| held_out-003 | higher | lower | slot_A | slot_A | No |
-| held_out-004 | higher | lower | slot_A | slot_A | No |
-| held_out-005 | lower | higher | slot_B | slot_A | No |
+**Minimum audit — 5 pairs, ~10 API calls:**
+
+```python
+for task_id in five_sampled_task_ids:
+    # Order 1: trained = slot A, baseline = slot B
+    score_order1 = judge(prompt(slot_A=trained[task_id], slot_B=baseline[task_id]))
+
+    # Order 2: baseline = slot A, trained = slot B
+    score_order2 = judge(prompt(slot_A=baseline[task_id], slot_B=trained[task_id]))
+
+    flipped = preferred_output(score_order1) != preferred_output(score_order2)
+```
+
+**What to report:**
 
 ```
-flip_rate:            0.0   (0 of 5 pairs changed preferred output after swap)
-slot_A_win_rate_order1: 0.6  (trained in slot A)
-slot_A_win_rate_order2: 0.8  (prompt_only in slot A)
+flip_rate = flipped_pairs / total_pairs
+slot_A_win_rate_order1 = times slot_A won when trained was in slot_A
+slot_A_win_rate_order2 = times slot_A won when baseline was in slot_A
 ```
 
-**What this proves:** The deterministic scorer has 0% flip rate because it scores each
-candidate against the rubric independently — not comparatively. Position is irrelevant
-to a rule-based scorer.
+**Red flag:** If `slot_A_win_rate` is high in both orderings regardless of which output
+is in slot A, the judge is preferring position over content. Wang et al. (2023) found
+this pattern in GPT-4 — it preferred the first response in 60%+ of cases in some
+settings even when the content was equivalent.
 
-**What this means for Yakob:** His judge is a comparative LLM judge — it sees both
-candidates in one prompt and picks a winner. That is exactly where position bias lives.
-The 0% flip rate here is a baseline showing what position-invariance looks like. Yakob
-needs to run the same swap with live API calls to his actual judge — if slot_A_win_rate
-stays high across both orderings regardless of which output is in slot A, position bias
-is inflating his Delta A.
+**Green flag:** flip_rate < 0.2 and slot_A_win_rates roughly equal across both orderings.
 
 ---
 
