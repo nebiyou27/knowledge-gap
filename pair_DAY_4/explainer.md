@@ -240,43 +240,46 @@ materially change LLM-judge outcomes, and the test is cheap.
 
 ---
 
-## Position-swap audit Yakob should run next
+## Concrete demonstration: live position-swap audit
 
-I did not run a live position-swap here because the diagnostic requires extra judge API
-calls against Yakob's actual LLM comparative judge — not a deterministic scorer. A
-deterministic scorer evaluates each candidate independently against a rubric, so slot
-order is irrelevant by design. Yakob's judge sees both candidates in one prompt and picks
-a winner — that is exactly where position bias lives.
+I ran a live position-swap audit using `gpt-4o-mini` as a comparative judge via OpenRouter.
+The judge was shown two sales email candidates and asked to pick the better one ("A" or "B").
+Each of 5 pairs was judged twice — once with trained=A, once with prompt_only=A.
 
-**Minimum audit — 5 pairs, ~10 API calls:**
+See `position_swap_live.py` for the full script and `position_swap_results.json` for raw output.
 
-```python
-for task_id in five_sampled_task_ids:
-    # Order 1: trained = slot A, baseline = slot B
-    score_order1 = judge(prompt(slot_A=trained[task_id], slot_B=baseline[task_id]))
+**Results:**
 
-    # Order 2: baseline = slot A, trained = slot B
-    score_order2 = judge(prompt(slot_A=baseline[task_id], slot_B=trained[task_id]))
-
-    flipped = preferred_output(score_order1) != preferred_output(score_order2)
-```
-
-**What to report:**
+| Pair | Order1 winner (trained=A) | Order2 winner (prompt_only=A) | Flipped? |
+|---|---|---|---|
+| dev-programmatic-001 | prompt_only | trained | **Yes** |
+| dev-programmatic-002 | trained | trained | No |
+| dev-programmatic-003 | prompt_only | prompt_only | No |
+| dev-programmatic-004 | prompt_only | prompt_only | No |
+| dev-programmatic-005 | prompt_only | prompt_only | No |
 
 ```
-flip_rate = flipped_pairs / total_pairs
-slot_A_win_rate_order1 = times slot_A won when trained was in slot_A
-slot_A_win_rate_order2 = times slot_A won when baseline was in slot_A
+flip_rate:                              0.20  (1 of 5 pairs)
+slot_A_win_rate_order1 (trained=A):     0.20
+slot_A_win_rate_order2 (prompt_only=A): 0.60
 ```
 
-**Red flag:** If `slot_A_win_rate` is high in both orderings regardless of which output
-is in slot A, the judge is preferring position over content. Wang et al. (2023) found
-this pattern in GPT-4 — it preferred the first response in 60%+ of cases in some
-settings even when the content was equivalent.
+**Interpretation:**
 
-**Initial green flag (not a clearance):** flip_rate < 0.2 and slot_A_win_rates roughly
-equal across both orderings. Note: 5 pairs is too small to fully rule out position bias —
-it is a low-cost first screen, not a definitive audit.
+The `slot_A_win_rate` jumped from 0.20 to 0.60 when the output in slot A changed — that
+asymmetry is the pattern Wang et al. (2023) describe as a position bias signal. The judge
+was more willing to pick slot A when prompt_only occupied it than when trained did.
+
+Verdict: **Ambiguous — 5 pairs is not enough to confirm or rule out bias.** It is a
+low-cost first screen, not a definitive clearance.
+
+**What this means for Yakob:** Run the same audit on his actual comparative judge with at
+least 20 pairs. If slot_A_win_rate stays high in both orderings regardless of which output
+is in slot A, position bias is a plausible partial explanation for his Delta A = +0.263.
+
+**Red flag threshold:** slot_A_win_rate > 0.65 in both orderings, or flip_rate > 0.35.
+**Initial green flag:** flip_rate < 0.2 and slot_A_win_rates within 0.15 of each other
+across both orderings — but still not a full clearance at n=5.
 
 ---
 

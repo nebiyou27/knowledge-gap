@@ -1,0 +1,50 @@
+{
+  "model": "openai/gpt-4o-mini",
+  "n_pairs": 5,
+  "flip_rate": 0.2,
+  "slot_A_win_rate_order1_trained_as_A": 0.2,
+  "slot_A_win_rate_order2_prompt_only_as_A": 0.6,
+  "verdict": "Ambiguous \u2014 run more pairs to confirm.",
+  "pairs": [
+    {
+      "task_id": "dev-programmatic-001-ai-maturity-structured-reply",
+      "order1_winner_slot": "B",
+      "order2_winner_slot": "B",
+      "preferred_order1": "prompt_only",
+      "preferred_order2": "trained",
+      "flipped": true
+    },
+    {
+      "task_id": "dev-programmatic-002-ai-maturity-structured-reply",
+      "order1_winner_slot": "A",
+      "order2_winner_slot": "B",
+      "preferred_order1": "trained",
+      "preferred_order2": "trained",
+      "flipped": false
+    },
+    {
+      "task_id": "dev-programmatic-003-ai-maturity-structured-reply",
+      "order1_winner_slot": "B",
+      "order2_winner_slot": "A",
+      "preferred_order1": "prompt_only",
+      "preferred_order2": "prompt_only",
+      "flipped": false
+    },
+    {
+      "task_id": "dev-programmatic-004-ai-maturity-structured-reply",
+      "order1_winner_slot": "B",
+      "order2_winner_slot": "A",
+      "preferred_order1": "prompt_only",
+      "preferred_order2": "prompt_only",
+      "flipped": false
+    },
+    {
+      "task_id": "dev-programmatic-005-thin-signal-restraint",
+      "order1_winner_slot": "B",
+      "order2_winner_slot": "A",
+      "preferred_order1": "prompt_only",
+      "preferred_order2": "prompt_only",
+      "flipped": false
+    }
+  ]
+}
