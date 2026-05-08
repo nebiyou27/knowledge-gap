@@ -90,6 +90,8 @@ Don't say the result is wrong. Say it needs one more audit step.
 Full explainer + experiment code:
 https://github.com/nebiyou27/knowledge-gap/blob/main/pair_DAY_4/explainer.md
 
+Blog post: https://medium.com/p/d8f349ab17b2
+
 Sources:
 - Zheng et al. (2023) MT-Bench — arxiv.org/abs/2306.05685
 - Wang et al. (2023) Large LLMs are not Fair Evaluators — arxiv.org/abs/2305.17926

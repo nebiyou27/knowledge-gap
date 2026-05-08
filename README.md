@@ -134,6 +134,41 @@ result: Delta B +18 pp, CI [+2%, +36%], significant.
 
 ---
 
+## Day 4 — LLM Evaluation Biases
+
+**Nebiyou's question:** Does auto-deriving evaluation topics and relevance labels from
+the same PageIndex structure used by the retrieval method create circular bias that
+inflates `precision@3` for PageIndex-assisted retrieval over baseline vector search,
+and is a held-out human-labeled query set the minimum fair fix?
+
+**Yakob's question:** In my Week 11 Tenacious-Bench, my LLM judge achieved ≥80%
+inter-rater agreement but was never tested for position bias, length bias, or
+self-preference bias. My Delta A = +0.263 (p<0.0001) — can this result be defended?
+
+**Key findings:**
+
+- **Evaluation coupling** — both questions are the same underlying problem: the
+  measurement system shares structure with the thing being measured. PageIndex labels
+  favor PageIndex retrieval; an unaudited judge may favor outputs matching its preferred
+  style or slot position.
+- **Position bias** — slot identity becomes a token-level feature during judge inference.
+  Live position-swap audit (gpt-4o-mini, n=5): flip_rate=0.20, slot_A_win_rate jumped
+  from 0.20 to 0.60 when outputs swapped slots — consistent with Wang et al. (2023).
+- **Length bias** — verbosity tokens act as proxy quality signals. Length screen on 50
+  outputs: no positive pattern found in deterministic artifacts.
+- **Self-preference bias** — familiarity, not authorship. Cross-model judging partially
+  mitigates but does not eliminate it.
+
+**Experiments:** `position_swap_live.py` (live LLM judge swap), `experiment.py`
+(deterministic length-bias screen)
+
+**Grounding commit:** `D:\TRP-1\Week-3\document-refinery\README.md` — added
+test-collection bias limitation note to the precision@3 evaluation section.
+
+**Published:** [Medium blog](https://medium.com/p/d8f349ab17b2) · [LinkedIn](https://www.linkedin.com/posts/nebiyou-abebe-aa3b34258_knowledge-gappairday4explainermd-at-share-7458587943528517633-Z6cK)
+
+---
+
 ## Papers
 
 - Vaswani et al. (2017) *Attention Is All You Need* — [arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
@@ -142,3 +177,6 @@ result: Delta B +18 pp, CI [+2%, +36%], significant.
 - Hu et al. (2022) *LoRA: Low-Rank Adaptation of Large Language Models* — [arxiv.org/abs/2106.09685](https://arxiv.org/abs/2106.09685)
 - Hong et al. (2024) *ORPO: Monolithic Preference Optimization without Reference Model* — [arxiv.org/abs/2403.07691](https://arxiv.org/abs/2403.07691)
 - Welleck et al. (2019) *Neural Text Generation with Unlikelihood Training* — [arxiv.org/abs/1908.04319](https://arxiv.org/abs/1908.04319)
+- Zheng et al. (2023) *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena* — [arxiv.org/abs/2306.05685](https://arxiv.org/abs/2306.05685)
+- Wang et al. (2023) *Large Language Models are not Fair Evaluators* — [arxiv.org/abs/2305.17926](https://arxiv.org/abs/2305.17926)
+- Voorhees (2002) *The Philosophy of Information Retrieval Evaluation* — [NIST](https://www.nist.gov/publications/philosophy-information-retrieval-evaluation)
