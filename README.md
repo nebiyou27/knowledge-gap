@@ -25,6 +25,7 @@ commit record.
 | Day 1 | Natnael Alemseged | Inference-time mechanics — prompt caching and LoRA latency |
 | Day 2 | Addisu Taye | Agent and tool-use internals — function-calling at the token level |
 | Day 3 | Gashaw Bekele | Training mechanics — LoRA behavioral asymmetry and statistical power |
+| Day 4 | Yakob Dereje / Rafia Kedir | LLM evaluation biases — position, length, and self-preference |
 
 ---
 
@@ -34,9 +35,13 @@ commit record.
 pair_DAY_1/          # Day 1 — Natnael Alemseged
 pair_DAY_2/          # Day 2 — Addisu Taye
 pair_DAY_3/          # Day 3 — Gashaw Bekele
+pair_DAY_4/          # Day 4 — Yakob Dereje / Rafia Kedir
+synthesis.md         # Week synthesis — all eight gaps, key findings, evaluation checklist
+canonical_list.md    # Annotated papers, tools, and patterns for FDEs
+portfolio_update.md  # How the four grounding commits improve the Week 10/11 portfolio
 ```
 
-Each folder contains:
+Each day folder contains:
 
 | File | Description |
 |------|-------------|
@@ -66,7 +71,7 @@ break the reusable prefix?
 — rewrote the cost-Pareto section with a mechanistic explanation of memory-bandwidth bound
 decode and the merge_and_unload shape argument. Added single-measurement caveat.
 
-**Published:** [Medium blog](https://medium.com/p/aef6253cc4e4)
+**Published:** [Medium blog](https://medium.com/p/aef6253cc4e4) · [LinkedIn](https://www.linkedin.com/posts/nebiyou-abebe-aa3b34258_my-partner-built-a-sales-agent-that-makes-share-7457396274036736000-k_4D)
 
 ---
 
@@ -94,7 +99,7 @@ fenced output). Approach B: 5/5 failures (no tool-call support on this stack).
 fencing" instruction. This mixed signal was the root cause of the P24 failure (43.3% invalid
 JSON rate).
 
-**Published:** [Medium blog](https://medium.com/p/5552d690723d)
+**Published:** [Medium blog](https://medium.com/p/5552d690723d) · [LinkedIn](https://www.linkedin.com/posts/nebiyou-abebe-aa3b34258_ai-llm-aiagents-share-7457806394801582081-Jpon)
 
 ---
 
@@ -130,7 +135,7 @@ produced it. Proves the mechanical difference between probability shift and deco
 — updated statistical significance gate from "requires 150–200 tasks" to confirmed 100-task
 result: Delta B +18 pp, CI [+2%, +36%], significant.
 
-**Published:** [Medium blog](https://medium.com/p/821b9c233dd8)
+**Published:** [Medium blog](https://medium.com/p/821b9c233dd8) · [LinkedIn](https://www.linkedin.com/posts/nebiyou-abebe-aa3b34258_why-lora-learned-be-shorter-but-not-never-share-7458915619749617664-u7XP)
 
 ---
 
